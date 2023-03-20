@@ -2,9 +2,7 @@
  import axios from 'axios';
 
 const API_KEY = '5f76dde929e4c69194ca7d9e261d3a85';
-
 const BASE_URL = 'https://api.themoviedb.org/3';
-
 axios.defaults.baseURL = BASE_URL;
 
 export async function getPopularMovies() {
