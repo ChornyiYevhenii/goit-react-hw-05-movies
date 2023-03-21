@@ -1,7 +1,13 @@
-export default function SearchForm() {
+export default function SearchForm({ onSubmit }) {
+    const handleSubmit = evt => {
+        evt.preventDefault();
+        onSubmit(evt.currentTarget.query.value);
+        // evt.currentTarget.reset()
+}
+
     return (
-        <form>
-            <input type="text" />
+        <form onSubmit={handleSubmit}>
+            <input type="text" name="query" />
             <button type="submit">Search</button>
         </form>
     )
