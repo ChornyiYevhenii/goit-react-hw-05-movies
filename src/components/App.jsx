@@ -1,15 +1,18 @@
-import Home from "pages/Home/Home"
-import MovieDetails from "pages/MovieDetails/MovieDetails";
-import Movies from "pages/Movies/Movies";
 import { Route, Routes } from "react-router-dom";
 import Cast from "./Cast/Cast";
 import Navigation from "./Navigation/Navigation";
 import Reviews from "./Reviews/Reviews";
+import { lazy, Suspense } from 'react';
+
+const Home = lazy(() => import('pages/Home/Home'));
+const Movies = lazy(() => import('pages/Movies/Movies'));
+const MovieDetails = lazy(() => import('pages/MovieDetails/MovieDetails'));
 
 
 export const App = () => {
   return (
     <div>
+      <Suspense fallback={<p>Loading...</p>}>
       <Routes>
         <Route path="/" element={<Navigation />}>
           <Route index element={<Home />} />
@@ -19,7 +22,8 @@ export const App = () => {
             <Route path="reviews" element={<Reviews />} />
           </Route>
         </Route>
-     </Routes>
+        </Routes>
+        </Suspense>
     </div>
   );
 };

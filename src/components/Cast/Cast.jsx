@@ -44,27 +44,3 @@ export default function Cast() {
 
 
 
-
-
-
-// import { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom"
-// import { getMovieCasts } from "services/movieApi";
-
-// export default function Cast() {
-//     const { id } useParams();
-
-//     const [casts, setCasts] = useState([]);
-
-//     useEffect(() => {
-//         getMovieCasts(id).then(setCasts);
-//     }, [id]);
-
-//     return (
-//         <div>
-//             {casts.map(cast => {
-//                 return <p key={cast.id}>{cast.name}</p>
-//              })}
-//         </div>
-//     )
-// }
