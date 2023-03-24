@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getMovieReviews } from 'services/movieApi';
 
+
 export default function Reviews() {
   const { id } = useParams();
   const [reviews, setReviews] = useState([]);
@@ -9,6 +10,7 @@ export default function Reviews() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
@@ -21,6 +23,7 @@ export default function Reviews() {
       }
     };
     fetchData();
+
   }, [id]);
 
   if (reviews.length === 0 && !isLoading) {

@@ -1,18 +1,43 @@
-import MoviesList from "components/MoviesList/MoviesList";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { getPopularMovies } from 'services/movieApi';
+import MoviesList from 'components/MoviesList';
+import SkeletonMoviesList from 'components/SkeletonMoviesList';
+
 
 const Home = () => {
-    const [movies, setMovies] = useState([]);
+  
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-    useEffect(() => {
-        getPopularMovies().then(setMovies);
-    }, []);
+  useEffect(() => {
+    const fetchdata = async () => {
+      try {
+        setIsLoading(true);
+        const movies = await getPopularMovies();
+        setMovies(movies);
+      } catch (e) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchdata();
+  }, []);
 
-    return <MoviesList movies={movies} />;
+  return (
+    <>
+      <h1>Trending today</h1>
+      {error && 'Error, please reload the page'}
+      {isLoading && <SkeletonMoviesList />}
+      <MoviesList movies={movies} />
+    </>
+  );
+};
+
+Home.propTypes = {
+  movies: PropTypes.array.isRequired,
 };
 
 export default Home;
-
-
-    

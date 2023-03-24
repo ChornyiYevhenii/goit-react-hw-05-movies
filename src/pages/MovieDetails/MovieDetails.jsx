@@ -1,38 +1,128 @@
-import { Suspense, useEffect, useState } from "react";
-import { useParams, useLocation, useNavigate, Outlet, NavLink } from "react-router-dom";
-import { getMovieDetails } from "services/movieApi";
+import { Outlet, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { getMovieDetails } from 'services/movieApi';
+import imageComingSoon from '../../images/imageComingSoon.jpg';
+import { IMAGE_URL } from 'constants/constants';
+import SkeletonMoviesList from 'components/SkeletonMoviesList';
+import {
+  MovieCard,
+  InfoItem,
+  InfoLink,
+  Title,
+  Wrapper,
+  ImageWrapper,
+  ExtraInfoSection,
+  ListItem,
+  ExtraInfoTitle,
+  MovieInfo,
+  BackButton,
+} from './MovieDetails.styled';
 
-const BASE_IMG_URL = 'https://image.tmdb.org/t/p/w500';
+import { Suspense } from 'react';
 
-export default function MovieDetails() {
-    const { id } = useParams();
-    const [movie, setMovie] = useState(null);
-    const location = useLocation();
-    const navigate = useNavigate();
+const MovieDetails = () => {
 
-    useEffect(() => {
-        getMovieDetails(id).then(setMovie);
-    }, [id]);
+  const { id } = useParams();
+  const [movieDetails, setMovieDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const { state } = useLocation();
+  const navigate = useNavigate();
 
-    const handleGoBack = () => {
-        navigate(location?.state?.from ?? '/');
-    }
-    if (!movie) {
-    return <p>Loading...</p>
-}
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const movie = await getMovieDetails(id);
+        setMovieDetails(movie);
+      } catch {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  
+  const handleGoBack = () => {
+    navigate(state?.from || '/');
+  };
+
+  if (movieDetails) {
+    const {
+      genres,
+      title,
+      release_date: releaseDateRaw,
+      overview,
+      vote_average: voteAverage,
+      poster_path: posterPath,
+    } = movieDetails;
+
+    const imageSRC = posterPath ? `${IMAGE_URL}${posterPath}` : imageComingSoon;
+    const userScore = Math.round(voteAverage * 10);
+    const movieGenres = genres.map(g => g.name).join(' ');
+    const releaseDate = releaseDateRaw?.slice(0, 4);
     return (
-        <>
-            <button onClick={handleGoBack}>Go back</button>
-            <p>{movie.title}</p>
-            <img src={`${BASE_IMG_URL}${movie.poster_path}`} alt={movie.title} />
+      <>
+        <BackButton onClick={handleGoBack}>Go Back</BackButton>
+        <Wrapper>
+          <MovieCard>
+            <ImageWrapper>
+              <img src={imageSRC} alt={title} />
+            </ImageWrapper>
+            <MovieInfo>
+              <Title>
+                {title} {releaseDate && `(${releaseDate})`}
+              </Title>
+              <ul>
+                <InfoItem>
+                  {userScore > 0 && <p>User Score: {userScore}%</p>}
+                </InfoItem>
+                <InfoItem>
+                  <b>Overview</b>
+                  <p>{overview}</p>
+                </InfoItem>
+                <InfoItem>
+                  <b>Genres</b>
+                  <p>{movieGenres || ' - '}</p>
+                </InfoItem>
+              </ul>
+            </MovieInfo>
+          </MovieCard>
+        </Wrapper>
+        <ExtraInfoSection>
+          <ExtraInfoTitle> Additional information</ExtraInfoTitle>
+          <div>
+            <ul>
+              <ListItem>
+                <InfoLink to="cast" state={state}>
+                  Cast
+                </InfoLink>
+              </ListItem>
 
-            <div>
-                <NavLink to={'cast'} state={{from: location?.state?.from ?? '/'}}>Cast</NavLink>
-                <NavLink to={'reviews'} state={{from: location?.state?.from ?? '/'}}>Reviews</NavLink>
-            </div>
-            <Suspense fallback={<p>Loading...</p>}>
-                <Outlet />
-            </Suspense>
-    </>
+              <ListItem>
+                <InfoLink to="reviews" state={state}>
+                  Reviews
+                </InfoLink>
+              </ListItem>
+            </ul>
+          </div>
+        </ExtraInfoSection>
+
+        <Suspense fallback={<div>Loading subpage...</div>}>
+          <Outlet />
+        </Suspense>
+      </>
     );
-}
+  }
+
+  return (
+    <>
+      {error && <div>Error, please reload the page</div>}
+      {isLoading && <SkeletonMoviesList />}
+    </>
+  );
+};
+
+export default MovieDetails;
