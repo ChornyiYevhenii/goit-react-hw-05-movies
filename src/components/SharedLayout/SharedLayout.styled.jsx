@@ -12,9 +12,9 @@ export const Header = styled.header`
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 8px 0;
+  padding: 5px 0;
   margin-bottom: 18px;
-  border-bottom: 2px solid black;
+  border-bottom: 8px solid black;
 
   > nav {
     display: flex;
